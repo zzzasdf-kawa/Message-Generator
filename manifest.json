@@ -1,0 +1,15 @@
+{
+  "name": "KAWA 문자 세트 생성기",
+  "short_name": "KAWA",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F97316",
+  "theme_color": "#F97316",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
