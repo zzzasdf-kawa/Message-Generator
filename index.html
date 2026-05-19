@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAWA 문자 세트 생성기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%23F97316'/%3E%3Crect x='90' y='160' width='332' height='228' rx='16' fill='none' stroke='white' stroke-width='22'/%3E%3Cpolyline points='90,160 256,290 422,160' fill='none' stroke='white' stroke-width='22'/%3E%3Cline x1='90' y1='388' x2='200' y2='292' stroke='white' stroke-width='20' fill='none'/%3E%3Cline x1='422' y1='388' x2='312' y2='292' stroke='white' stroke-width='20' fill='none'/%3E%3Ccircle cx='256' cy='291' r='64' fill='%23EA6A0A'/%3E%3Ccircle cx='256' cy='291' r='54' fill='%23F97316'/%3E%3Ccircle cx='256' cy='291' r='46' fill='%23EA6A0A'/%3E%3Cellipse cx='256' cy='305' rx='22' ry='19' fill='white'/%3E%3Cellipse cx='224' cy='281' rx='12' ry='10' fill='white'/%3E%3Cellipse cx='244' cy='268' rx='12' ry='10' fill='white'/%3E%3Cellipse cx='268' cy='268' rx='12' ry='10' fill='white'/%3E%3Cellipse cx='288' cy='281' rx='12' ry='10' fill='white'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #efefec;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --text-tertiary: #999994;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --accent: #1a6ef5;
+    --accent-bg: #e8f0fe;
+    --accent-text: #1a4fa0;
+    --success-bg: #eaf3de;
+    --success-text: #3b6d11;
+    --danger-bg: #fcebeb;
+    --danger-text: #a32d2d;
+    --warning-bg: #faeeda;
+    --warning-text: #854f0b;
+    --kakao: #FEF3C7;
+    --kakao-text: #92400E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1c; --bg-secondary: #2a2a28; --bg-tertiary: #333330;
+      --text: #f0f0ec; --text-secondary: #a0a09a; --text-tertiary: #6a6a64;
+      --border: rgba(255,255,255,0.10); --border-md: rgba(255,255,255,0.20);
+      --accent: #4a8af4; --accent-bg: #1a2a4a; --accent-text: #90b8f8;
+      --success-bg: #173404; --success-text: #c0dd97;
+      --danger-bg: #501313; --danger-text: #f09595;
+      --warning-bg: #412402; --warning-text: #fac775;
+      --kakao: #3a2800; --kakao-text: #fac775;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; background: var(--bg-tertiary); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+  .app-wrap { max-width: 680px; margin: 0 auto; background: var(--bg); border-radius: 16px; border: 0.5px solid var(--border); padding: 2rem; box-shadow: 0 2px 24px rgba(0,0,0,0.06); }
+  .app-header { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 0.5px solid var(--border); }
+  .app-logo { width: 36px; height: 36px; background: var(--accent-bg); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent-text); }
+  .app-title { font-size: 17px; font-weight: 500; }
+  .app-sub { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+  .header-right { margin-left: auto; }
+  .library-btn { border: 0.5px solid var(--border-md); background: var(--bg-secondary); color: var(--text-secondary); border-radius: var(--radius-md); padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }
+  .library-btn:hover { color: var(--text); }
+  .badge { background: var(--accent); color: #fff; border-radius: 999px; font-size: 10px; padding: 1px 5px; font-weight: 500; min-width: 16px; text-align: center; }
+  .section-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 8px; font-weight: 500; }
+  .segment-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+  .seg-btn { border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text); border-radius: var(--radius-md); padding: 6px 14px; font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .seg-btn:hover { background: var(--bg-secondary); }
+  .seg-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
+  .all-btn { border: 0.5px solid var(--border); background: var(--bg-secondary); color: var(--text-secondary); border-radius: var(--radius-md); padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+  .season-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; }
+  .season-btn { border: 0.5px solid var(--border); background: var(--bg); color: var(--text-secondary); border-radius: 999px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .season-btn:hover { border-color: var(--border-md); color: var(--text); }
+  .season-btn.active { background: var(--warning-bg); border-color: var(--warning-text); color: var(--warning-text); font-weight: 500; }
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
+  .input-row { margin-bottom: 1rem; }
+  textarea, input[type=text] { width: 100%; border: 0.5px solid var(--border-md); border-radius: var(--radius-md); background: var(--bg); color: var(--text); font-family: inherit; font-size: 14px; padding: 10px 12px; resize: vertical; line-height: 1.6; }
+  textarea:focus, input[type=text]:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,110,245,0.1); }
+  .char-count { font-size: 11px; color: var(--text-tertiary); text-align: right; margin-top: 4px; }
+  .notice { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; }
+  .gen-btn { width: 100%; padding: 13px; background: var(--accent); border: none; border-radius: var(--radius-md); color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .gen-btn:hover { opacity: 0.88; }
+  .gen-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .results-area { margin-top: 2rem; }
+  .result-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .result-header-left { display: flex; align-items: center; gap: 8px; }
+  .seg-tag { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: var(--radius-md); }
+  .learned-badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; background: var(--success-bg); color: var(--success-text); display: flex; align-items: center; gap: 3px; }
+  .result-actions { display: flex; align-items: center; gap: 6px; }
+  .copy-btn, .save-btn { font-size: 12px; border: 0.5px solid var(--border); background: transparent; border-radius: var(--radius-md); padding: 4px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; color: var(--text-secondary); }
+  .copy-btn:hover { background: var(--bg-secondary); }
+  .save-btn { color: var(--accent-text); border-color: var(--accent-bg); background: var(--accent-bg); }
+  .save-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .save-btn.saved { background: var(--success-bg); color: var(--success-text); border-color: var(--success-bg); cursor: default; }
+  .msg-textarea { width: 100%; border: 0.5px solid var(--border); border-radius: var(--radius-md); background: var(--bg-secondary); color: var(--text); font-family: inherit; font-size: 14px; line-height: 1.7; padding: 10px 12px; resize: vertical; min-height: 160px; }
+  .msg-textarea:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+  .image-section { margin-top: 1.5rem; }
+  .image-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 10px; margin-top: 0.75rem; }
+  .img-card { border: 0.5px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .img-mock { height: 90px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); }
+  .img-desc { padding: 8px 10px; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .img-desc strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 3px; }
+  .loading-indicator { text-align: center; padding: 2.5rem; color: var(--text-secondary); font-size: 14px; }
+  .dot-anim::after { content: '.'; animation: dots 1.5s infinite; }
+  @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+  .error-msg { text-align: center; padding: 2rem; color: var(--danger-text); font-size: 14px; background: var(--danger-bg); border-radius: var(--radius-md); }
+  .learning-bar { background: var(--success-bg); border: 0.5px solid rgba(59,109,17,0.2); border-radius: var(--radius-md); padding: 8px 12px; font-size: 12px; color: var(--success-text); display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+
+  /* 라이브러리 패널 */
+  .library-panel { display: none; margin-top: 1.5rem; border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .library-panel.open { display: block; }
+  .library-header { padding: 12px 1.25rem; background: var(--bg-secondary); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .library-header-left { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+  .library-filter { display: flex; gap: 6px; padding: 10px 1.25rem; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; }
+  .filter-btn { border: 0.5px solid var(--border); background: transparent; color: var(--text-secondary); border-radius: 999px; padding: 3px 10px; font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.12s; }
+  .filter-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
+  .library-empty { padding: 2rem; text-align: center; color: var(--text-tertiary); font-size: 13px; line-height: 1.7; }
+  .library-list { max-height: 380px; overflow-y: auto; }
+  .lib-item { padding: 12px 1.25rem; border-bottom: 0.5px solid var(--border); }
+  .lib-item:last-child { border-bottom: none; }
+  .lib-item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .lib-seg-tag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-md); }
+  .lib-date { font-size: 11px; color: var(--text-tertiary); margin-left: auto; }
+  .lib-delete { font-size: 11px; color: var(--text-tertiary); background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: var(--radius-md); font-family: inherit; }
+  .lib-delete:hover { background: var(--danger-bg); color: var(--danger-text); }
+  .lib-preview { font-size: 13px; color: var(--text-secondary); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .lib-campaign { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .lib-footer { padding: 10px 1.25rem; border-top: 0.5px solid var(--border); background: var(--bg-secondary); display: flex; justify-content: flex-end; }
+  .clear-btn { font-size: 11px; color: var(--danger-text); background: none; border: none; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+<div class="app-wrap">
+  <div class="app-header">
+    <div class="app-logo"><i class="ti ti-paw"></i></div>
+    <div>
+      <div class="app-title">KAWA 문자 세트 생성기</div>
+      <div class="app-sub">동물자유연대 회원모금팀</div>
+    </div>
+    <div class="header-right">
+      <button class="library-btn" onclick="toggleLibrary()">
+        <i class="ti ti-history"></i> 완성본 라이브러리 <span class="badge" id="lib-badge">0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 라이브러리 패널 -->
+  <div class="library-panel" id="library-panel">
+    <div class="library-header">
+      <div class="library-header-left"><i class="ti ti-database"></i> 저장된 완성본</div>
+      <span style="font-size:11px;color:var(--text-tertiary)">다음 생성 시 자동으로 참고해요</span>
+    </div>
+    <div class="library-filter">
+      <button class="filter-btn active" data-seg="전체" onclick="filterLib(this)">전체</button>
+      <button class="filter-btn" data-seg="회원" onclick="filterLib(this)">회원</button>
+      <button class="filter-btn" data-seg="핫리드" onclick="filterLib(this)">핫리드</button>
+      <button class="filter-btn" data-seg="웜리드" onclick="filterLib(this)">웜리드</button>
+      <button class="filter-btn" data-seg="일반리드" onclick="filterLib(this)">일반리드</button>
+      <button class="filter-btn" data-seg="카카오채널" onclick="filterLib(this)">카카오채널</button>
+    </div>
+    <div class="library-list" id="library-list"></div>
+    <div class="lib-footer">
+      <button class="clear-btn" onclick="clearAll()"><i class="ti ti-trash"></i> 전체 삭제</button>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <p class="section-label">대상 세그먼트</p>
+    <div class="segment-grid">
+      <button class="all-btn" onclick="toggleAll()"><i class="ti ti-checks"></i> 전체선택</button>
+      <button class="seg-btn" data-seg="회원" onclick="toggleSeg(this)">회원 <span style="font-size:11px;opacity:0.6">5만명</span></button>
+      <button class="seg-btn" data-seg="핫리드" onclick="toggleSeg(this)">핫리드 <span style="font-size:11px;opacity:0.6">2만명</span></button>
+      <button class="seg-btn" data-seg="웜리드" onclick="toggleSeg(this)">웜리드 <span style="font-size:11px;opacity:0.6">4.2만명</span></button>
+      <button class="seg-btn" data-seg="일반리드" onclick="toggleSeg(this)">일반리드 <span style="font-size:11px;opacity:0.6">11만명</span></button>
+      <button class="seg-btn" data-seg="카카오채널" onclick="toggleSeg(this)">카카오채널 <span style="font-size:11px;opacity:0.6">4.4만명</span></button>
+    </div>
+
+    <p class="section-label">시즌 옵션 <span style="font-weight:400;letter-spacing:0;text-transform:none">(선택)</span></p>
+    <div class="season-grid">
+      <button class="season-btn active" data-season="없음" onclick="selectSeason(this)">없음</button>
+      <button class="season-btn" data-season="설" onclick="selectSeason(this)">설</button>
+      <button class="season-btn" data-season="추석" onclick="selectSeason(this)">추석</button>
+      <button class="season-btn" data-season="가정의달" onclick="selectSeason(this)">가정의달</button>
+      <button class="season-btn" data-season="크리스마스" onclick="selectSeason(this)">크리스마스</button>
+      <button class="season-btn" data-season="봄" onclick="selectSeason(this)">봄</button>
+      <button class="season-btn" data-season="여름" onclick="selectSeason(this)">여름</button>
+      <button class="season-btn" data-season="가을" onclick="selectSeason(this)">가을</button>
+      <button class="season-btn" data-season="겨울" onclick="selectSeason(this)">겨울</button>
+    </div>
+
+    <hr class="divider">
+
+    <p class="section-label">이달의 캠페인 배경</p>
+    <div class="input-row">
+      <textarea id="campaign-bg" rows="4" placeholder="예) 4월에 신종펫숍 단속 결과로 학대견 38마리를 구조했습니다. 가해자는 현재 재판 중이며, 엄벌을 요구하는 탄원서명을 진행 중입니다." oninput="updateCount()"></textarea>
+      <div class="char-count" id="char-count">0자</div>
+    </div>
+
+    <p class="section-label">참고 링크 <span style="font-weight:400;letter-spacing:0;text-transform:none">(선택)</span></p>
+    <div class="input-row">
+      <input type="text" id="ref-link" placeholder="https://youtu.be/... 또는 캠페인 페이지 URL">
+      <p class="notice">링크는 문자 하단에 자동 삽입됩니다</p>
+    </div>
+
+    <button class="gen-btn" id="gen-btn" onclick="generate()">
+      <i class="ti ti-sparkles"></i> 문자 세트 생성하기
+    </button>
+
+    <div id="results-area" class="results-area"></div>
+  </div>
+</div>
+
+<script>
+const SEG_COLORS = {
+  '회원':       { bg:'var(--success-bg)',   color:'var(--success-text)' },
+  '핫리드':     { bg:'var(--danger-bg)',    color:'var(--danger-text)' },
+  '웜리드':     { bg:'var(--warning-bg)',   color:'var(--warning-text)' },
+  '일반리드':   { bg:'var(--bg-secondary)', color:'var(--text-secondary)' },
+  '카카오채널': { bg:'var(--kakao)',        color:'var(--kakao-text)' }
+};
+const SEG_INFO = {
+  '회원':       '#{구성원.구성원명} 회원님 이라고 호칭. 후원효능감과 감사함이 느껴지도록. 함께 만들어온 성과 강조. 가슴 벅찬 감동 포인트 포함.',
+  '핫리드':     '#{구성원.구성원명}님 이라고 호칭. 성과 중심 메시지로 동물자유연대의 역량을 보여줘 정기후원 전환을 유도. 신뢰와 행동 촉구 균형.',
+  '웜리드':     '#{구성원.구성원명}님 이라고 호칭. 참여거리(탄원서명, 행사 등) 제공이 최우선. 부담 없이 클릭할 수 있는 참여 CTA 포함.',
+  '일반리드':   '#{구성원.구성원명}님 이라고 호칭. 연 2회 발송 수준의 기본 관계 유지. 간결하고 따뜻하게. 과도한 CTA 지양.',
+  '카카오채널': '호칭 없음. 카카오 채널 특성에 맞게 더 키치하고 친밀감 있는 톤. 이모지 활용 가능. 짧고 임팩트 있게.'
+};
+const SEASON_CONTEXT = {
+  '없음':'', '설':'설 명절 맥락 반영. "새해 복 많이 받으세요", "새해에도 함께" 같은 새해 인사 자연스럽게 녹여넣기.',
+  '추석':'추석 명절 맥락 반영. "풍성한 한가위" 표현 활용. 가족, 나눔, 따뜻함 분위기.',
+  '가정의달':'5월 가정의달 맥락. 생명, 가족, 돌봄 가치 연결.',
+  '크리스마스':'크리스마스/연말 분위기. 온기, 함께, 한 해 마무리 감사 뉘앙스.',
+  '봄':'봄 시즌 연결. 새 생명, 따뜻해지는 계절 느낌.',
+  '여름':'여름 시즌 연결. 생명력, 열정, 현장감 느낌.',
+  '가을':'가을 시즌 연결. 결실, 감사, 풍요로움 느낌.',
+  '겨울':'겨울 시즌 연결. 추위, 보호, 따뜻함이 더 소중한 계절 뉘앙스.'
+};
+const IMAGE_CONCEPTS = {
+  '구조성과': [
+    { icon:'ti-camera',            label:'클로즈업 얼굴컷',  desc:'구조된 동물의 눈빛 클로즈업. 감정 이입 극대화. 따뜻한 자연광.' },
+    { icon:'ti-arrows-left-right', label:'구조 전후 비교',   desc:'열악한 환경 → 밝고 안전한 공간. 희망의 서사 한 장에.' },
+    { icon:'ti-users',             label:'활동가 현장컷',    desc:'현장에서 동물을 안고 있는 활동가. 신뢰와 전문성 전달.' }
+  ],
+  '캠페인참여': [
+    { icon:'ti-writing',      label:'탄원서명 화면',   desc:'서명 페이지 스크린샷 + 참여자 수 카운터. 사회적 증거 활용.' },
+    { icon:'ti-shield',       label:'동물 + 메시지',   desc:'동물 이미지와 "함께해주세요" 텍스트 오버레이. 심플하고 강렬하게.' },
+    { icon:'ti-trending-up',  label:'성과 인포그래픽', desc:'숫자로 보여주는 임팩트. "38마리 구조" 등 핵심 수치 타이포그래피.' }
+  ]
+};
+const STORAGE_KEY = 'kawa_completed_messages';
+let selectedSegs = [], selectedSeason = '없음', currentFilter = '전체';
+
+function loadLibrary() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch { return []; } }
+function saveLibrary(lib) { localStorage.setItem(STORAGE_KEY, JSON.stringify(lib)); }
+function updateBadge() { document.getElementById('lib-badge').textContent = loadLibrary().length; }
+
+function toggleLibrary() {
+  const p = document.getElementById('library-panel');
+  p.classList.toggle('open');
+  if (p.classList.contains('open')) renderLibrary();
+}
+
+function filterLib(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.seg;
+  renderLibrary();
+}
+
+function renderLibrary() {
+  const lib = loadLibrary();
+  const filtered = currentFilter === '전체' ? lib : lib.filter(i => i.seg === currentFilter);
+  const el = document.getElementById('library-list');
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="library-empty"><i class="ti ti-inbox" style="font-size:24px;display:block;margin-bottom:8px"></i>저장된 완성본이 없어요.<br>생성 후 수정이 끝나면 완성본으로 저장해보세요.</div>';
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(item => {
+    const c = SEG_COLORS[item.seg] || SEG_COLORS['일반리드'];
+    return `<div class="lib-item">
+      <div class="lib-item-header">
+        <span class="lib-seg-tag" style="background:${c.bg};color:${c.color}">${item.seg}</span>
+        <span class="lib-date">${item.date}</span>
+        <button class="lib-delete" onclick="deleteItem(event,${item.id})"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="lib-preview">${item.text}</div>
+      <div class="lib-campaign">${item.campaign}</div>
+    </div>`;
+  }).join('');
+}
+
+function deleteItem(e, id) {
+  e.stopPropagation();
+  saveLibrary(loadLibrary().filter(i => i.id !== id));
+  updateBadge(); renderLibrary();
+}
+
+function clearAll() {
+  if (!confirm('저장된 완성본을 모두 삭제할까요?')) return;
+  saveLibrary([]); updateBadge(); renderLibrary();
+}
+
+function saveCompleted(seg, text, campaign) {
+  const lib = loadLibrary();
+  lib.push({ id: Date.now(), seg, text, campaign: campaign.slice(0,60)+(campaign.length>60?'…':''), date: new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric'}) });
+  saveLibrary(lib); updateBadge();
+}
+
+function getExamples(seg) { return loadLibrary().filter(i => i.seg === seg).slice(-3); }
+
+function toggleSeg(btn) {
+  const seg = btn.dataset.seg;
+  if (btn.classList.contains('active')) { btn.classList.remove('active'); selectedSegs = selectedSegs.filter(s=>s!==seg); }
+  else { btn.classList.add('active'); selectedSegs.push(seg); }
+}
+
+function toggleAll() {
+  const allBtns = document.querySelectorAll('.seg-btn');
+  const allActive = selectedSegs.length === allBtns.length;
+  allBtns.forEach(btn => { allActive ? btn.classList.remove('active') : btn.classList.add('active'); });
+  selectedSegs = allActive ? [] : ['회원','핫리드','웜리드','일반리드','카카오채널'];
+}
+
+function selectSeason(btn) {
+  document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); selectedSeason = btn.dataset.season;
+}
+
+function updateCount() { document.getElementById('char-count').textContent = document.getElementById('campaign-bg').value.length + '자'; }
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = el.closest('.result-card').querySelector('.copy-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="ti ti-check"></i> 복사됨';
+    setTimeout(() => { btn.innerHTML = orig; }, 1500);
+  });
+}
+
+function onEdit(msgId, seg) {
+  const el = document.getElementById(msgId);
+  const c = document.getElementById('count-'+seg);
+  if (c) c.textContent = el.value.length + '자';
+  const sb = document.getElementById('savebtn-'+msgId);
+  if (sb && sb.classList.contains('saved')) {
+    sb.classList.remove('saved'); sb.disabled = false;
+    sb.innerHTML = '<i class="ti ti-device-floppy"></i> 완성본 저장';
+  }
+}
+
+function onSave(msgId, seg, btn) {
+  const text = document.getElementById(msgId).value.trim();
+  const campaign = document.getElementById('campaign-bg').value.trim();
+  if (!text) return;
+  saveCompleted(seg, text, campaign);
+  btn.classList.add('saved'); btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-check"></i> 저장됨';
+  if (document.getElementById('library-panel').classList.contains('open')) renderLibrary();
+}
+
+async function generate() {
+  const bg = document.getElementById('campaign-bg').value.trim();
+  const link = document.getElementById('ref-link').value.trim();
+  if (!bg) {
+    const ta = document.getElementById('campaign-bg');
+    ta.focus(); ta.style.borderColor = '#e24b4a';
+    setTimeout(() => { ta.style.borderColor = ''; }, 2000); return;
+  }
+  if (selectedSegs.length === 0) { alert('세그먼트를 하나 이상 선택해주세요.'); return; }
+
+  const genBtn = document.getElementById('gen-btn');
+  genBtn.disabled = true;
+  genBtn.innerHTML = '<i class="ti ti-loader-2"></i> 생성 중<span class="dot-anim"></span>';
+  const resultsArea = document.getElementById('results-area');
+  resultsArea.innerHTML = '<div class="loading-indicator"><i class="ti ti-sparkles"></i> 문자 초안 생성 중<span class="dot-anim"></span></div>';
+
+  const exBySegs = {};
+  selectedSegs.forEach(seg => { const ex = getExamples(seg); if (ex.length > 0) exBySegs[seg] = ex; });
+  const hasEx = Object.keys(exBySegs).length > 0;
+
+  let exBlock = '';
+  if (hasEx) {
+    exBlock = '\n\n[세그먼트별 과거 완성본 — 이 스타일과 결을 참고하되 내용은 이번 캠페인에 맞게 새로 작성하세요]\n';
+    Object.entries(exBySegs).forEach(([seg, items]) => {
+      exBlock += `\n[${seg}] 과거 완성본:\n`;
+      items.forEach((item,i) => { exBlock += `  ${i+1}. ${item.text}\n`; });
+    });
+  }
+
+  const prompt = `당신은 동물자유연대(동물권 비영리단체) 회원모금팀의 문자 카피라이터입니다.
+아래 캠페인 배경과 세그먼트별 가이드에 따라 각 세그먼트용 문자 초안을 작성하세요.
+
+캠페인 배경:
+${bg}
+${link ? '참고 링크: '+link : ''}
+${SEASON_CONTEXT[selectedSeason] ? '시즌 맥락: '+SEASON_CONTEXT[selectedSeason] : ''}
+
+세그먼트별 작성 가이드:
+${selectedSegs.map(s=>`[${s}] ${SEG_INFO[s]}`).join('\n')}
+${exBlock}
+작성 규칙:
+- [동물자유연대] 발신자 표기는 제외 (시스템 자동 추가)
+- 각 세그먼트 문자는 한글 45자 내외 (카카오채널은 조금 더 길어도 됨)
+- 링크가 있으면 문자 마지막 줄에 포함
+- 과거 완성본이 있다면 그 결과 톤을 유지하면서 이번 캠페인 내용에 맞게 작성
+- 반드시 JSON 형식으로만 응답. 순수 JSON만, 마크다운 없이.
+
+응답 형식:
+{"messages":{"세그먼트명":"문자내용"},"image_type":"구조성과 또는 캠페인참여 중 하나"}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await resp.json();
+    const raw = data.content.map(i=>i.text||'').join('');
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const imgType = IMAGE_CONCEPTS[parsed.image_type] ? parsed.image_type : '구조성과';
+
+    let html = '';
+    if (hasEx) {
+      const total = Object.values(exBySegs).flat().length;
+      html += `<div class="learning-bar"><i class="ti ti-brain"></i> ${Object.keys(exBySegs).join(', ')} 세그먼트의 완성본 ${total}개를 참고해 생성했어요</div>`;
+    }
+
+    selectedSegs.forEach(seg => {
+      if (!parsed.messages[seg]) return;
+      const msgId = 'msg-'+seg.replace(/\s/g,'');
+      const c = SEG_COLORS[seg] || SEG_COLORS['일반리드'];
+      html += `<div class="result-card">
+        <div class="result-header">
+          <div class="result-header-left">
+            <span class="seg-tag" style="background:${c.bg};color:${c.color}">${seg}</span>
+            ${exBySegs[seg] ? '<span class="learned-badge"><i class="ti ti-sparkles" style="font-size:10px"></i> 학습 반영</span>' : ''}
+          </div>
+          <div class="result-actions">
+            <button class="save-btn" id="savebtn-${msgId}" onclick="onSave('${msgId}','${seg}',this)">
+              <i class="ti ti-device-floppy"></i> 완성본 저장
+            </button>
+            <button class="copy-btn" onclick="copyText('${msgId}')"><i class="ti ti-copy"></i> 복사</button>
+          </div>
+        </div>
+        <textarea class="msg-textarea" id="${msgId}" oninput="onEdit('${msgId}','${seg}')">${parsed.messages[seg]}</textarea>
+        <div class="char-count" id="count-${seg}">${parsed.messages[seg].length}자</div>
+      </div>`;
+    });
+
+    html += `<div class="image-section">
+      <p class="section-label" style="margin-top:0.5rem">추천 이미지 방향 — ${imgType}</p>
+      <div class="image-cards">
+        ${IMAGE_CONCEPTS[imgType].map(c=>`
+          <div class="img-card">
+            <div class="img-mock"><i class="ti ${c.icon}" style="font-size:32px;color:var(--text-secondary)"></i></div>
+            <div class="img-desc"><strong>${c.label}</strong>${c.desc}</div>
+          </div>`).join('')}
+      </div></div>`;
+
+    resultsArea.innerHTML = html;
+
+  } catch(e) {
+    resultsArea.innerHTML = `<div class="error-msg"><i class="ti ti-alert-circle"></i> 생성 중 오류가 발생했습니다.<br><small style="opacity:0.7">${e.message}</small></div>`;
+  }
+
+  genBtn.disabled = false;
+  genBtn.innerHTML = '<i class="ti ti-sparkles"></i> 문자 세트 생성하기';
+}
+
+updateBadge();
+</script>
+</body>
+</html>
